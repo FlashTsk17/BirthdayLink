@@ -72,7 +72,7 @@ function generateId(prefix) {
   return id;
 }
 
-async function resizeImage(dataUrl, maxDim = 900) {
+async function resizeImage(dataUrl, maxDim = 400) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
@@ -81,7 +81,7 @@ async function resizeImage(dataUrl, maxDim = 900) {
       canvas.width = Math.round(img.width * ratio);
       canvas.height = Math.round(img.height * ratio);
       canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.75));
+      resolve(canvas.toDataURL("image/jpeg", 0.50));
     };
     img.onerror = () => resolve(dataUrl);
     img.src = dataUrl;
@@ -99,7 +99,7 @@ const NOTE_FREQ = {
 
 const MOODS = {
   "🎉 Festif": {
-    bpm: 118,
+    bpm: 145,
     seq: [
       ["G4",0.75],["G4",0.25],["A4",1],["G4",1],["C5",1],["B4",2],["REST",0.5],
       ["G4",0.75],["G4",0.25],["A4",1],["G4",1],["D5",1],["C5",2],["REST",0.5],
@@ -108,7 +108,7 @@ const MOODS = {
     ],
   },
   "💃 Dansant": {
-    bpm: 128,
+    bpm: 155,
     seq: [
       ["C5",0.5],["E5",0.5],["G5",0.5],["E5",0.5],["C5",0.5],["G5",0.5],["E5",1],
       ["D5",0.5],["F5",0.5],["A5",0.5],["F5",0.5],["D5",0.5],["A5",0.5],["F5",1],
@@ -117,7 +117,7 @@ const MOODS = {
     ],
   },
   "🎵 Romantique": {
-    bpm: 66,
+    bpm: 82,
     seq: [
       ["E5",2],["D5",1],["C5",1],["D5",2],["E5",2],
       ["G5",2],["E5",2],["D5",3],["REST",1],
@@ -126,7 +126,7 @@ const MOODS = {
     ],
   },
   "🎸 Dynamique": {
-    bpm: 162,
+    bpm: 195,
     seq: [
       ["C5",0.5],["E5",0.5],["G5",0.5],["A5",0.5],["G5",0.5],["E5",0.5],["C5",1],
       ["D5",0.5],["F5",0.5],["A5",0.5],["B5",0.5],["A5",0.5],["F5",0.5],["D5",1],
@@ -179,7 +179,7 @@ function useMusicPlayer(mood) {
           s.current.next += beats * beatDur;
           s.current.idx++;
         }
-        s.current.timer = setTimeout(tick, 50);
+        s.current.timer = setTimeout(tick, 25);
       };
       tick();
     } catch (e) { console.error("Audio:", e); }
@@ -1048,7 +1048,7 @@ const copyLink = (id) => {
           value={aForm.message} onChange={e => setAForm(f => ({ ...f, message:e.target.value }))} />
 
         <label style={S.lbl()}>Ta photo (optionnel)</label>
-        <input type="file" accept="image/*" capture="environment"
+        <input type="file" accept="image/*" 
           style={{ marginTop:"10px", fontSize:"15px", width:"100%" }}
           onChange={e => e.target.files[0] && readFile(e.target.files[0], v => setAForm(f => ({ ...f, photo:v })))} />
         {aForm.photo && (
@@ -1169,7 +1169,7 @@ onClick={() => copyLink(code)}>
           value={cForm.message} onChange={e => setCForm(f => ({ ...f, message:e.target.value }))} />
 
         <label style={S.lbl("#8B5CF6")}>Une photo (optionnel)</label>
-        <input type="file" accept="image/*" capture="environment"
+        <input type="file" accept="image/*"
           style={{ marginTop:"10px", fontSize:"15px", width:"100%" }}
           onChange={e => e.target.files[0] && readFile(e.target.files[0], v => setCForm(f => ({ ...f, photo:v })))} />
         {cForm.photo && (
