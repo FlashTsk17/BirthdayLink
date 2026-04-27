@@ -1088,7 +1088,7 @@ const copyLink = (id) => {
         <h2 style={{ fontFamily:"'Fredoka One', cursive", fontSize:"clamp(22px,6vw,28px)", color:"#FF4757", margin:"8px 0 6px" }}>
           Ton annonce est prête !
         </h2>
-        <p style={{ color:"#aaa", fontSize:"14px", margin:"0 0 22px", fontWeight:"700" }}>Partage ce code avec tes proches 👇</p>
+        <p style={{ color:"#aaa", fontSize:"14px", margin:"0 0 22px", fontWeight:"700" }}>Partage ce lien avec tes proches 👇</p>
 
   <div style={S.codeBox()}>
   <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.75)", fontWeight:"900", letterSpacing:"2px", marginBottom:"8px" }}>TON LIEN D'ANNONCE</div>
@@ -1201,8 +1201,7 @@ onClick={() => copyLink(code)}>
           Envoie ce code à {announcement?.name || "l'anniversaire"} 🎁
         </p>
 
-        <div style={S.codeBox("linear-gradient(135deg,#A18CD1,#FBC2EB)")}>
-          <div style={S.codeBox("linear-gradient(135deg,#A18CD1,#FBC2EB)")}>
+        <div  style={S.codeBox("linear-gradient(135deg,#A18CD1,#FBC2EB)")}>
   <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.75)", fontWeight:"900", letterSpacing:"2px", marginBottom:"8px" }}>TON LIEN DE CARTE</div>
   <div style={{ fontSize:"clamp(11px,3vw,13px)", color:"white", wordBreak:"break-all", fontWeight:"700" }}>
     {buildShareLink(code)}
@@ -1216,7 +1215,10 @@ onClick={() => copyLink(code)}>
 
         <div style={S.info("#F9F5FF","#999")}>
           <strong style={{ color:"#8B5CF6" }}>Ensuite :</strong><br />
-          {announcement?.name || "L'anniversaire"} ouvre BirthdayLink → <em>"Voir une carte de vœux"</em> → entre ce code pour découvrir ta belle carte 🎊
+          <strong style={{ color:"#8B5CF6" }}>Ensuite :</strong><br />
+1️⃣ Clique "Partager le lien"<br />
+2️⃣ Envoie à {announcement?.name || "l'anniversaire"} via WhatsApp ou SMS<br />
+3️⃣ Il/Elle clique → voit ta carte directement 🎊
         </div>
 
         <button style={S.btn("linear-gradient(135deg,#667eea,#764ba2)")} onClick={() => go("home")}>🏠 Retour à l'accueil</button>
