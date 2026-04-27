@@ -72,7 +72,7 @@ function generateId(prefix) {
   return id;
 }
 
-async function resizeImage(dataUrl, maxDim = 400) {
+async function resizeImage(dataUrl, maxDim = 200) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
@@ -81,7 +81,7 @@ async function resizeImage(dataUrl, maxDim = 400) {
       canvas.width = Math.round(img.width * ratio);
       canvas.height = Math.round(img.height * ratio);
       canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.50));
+      resolve(canvas.toDataURL("image/jpeg", 0.2));
     };
     img.onerror = () => resolve(dataUrl);
     img.src = dataUrl;
@@ -126,7 +126,7 @@ const MOODS = {
     ],
   },
   "🎸 Dynamique": {
-    bpm: 195,
+    bpm: 235,
     seq: [
       ["C5",0.5],["E5",0.5],["G5",0.5],["A5",0.5],["G5",0.5],["E5",0.5],["C5",1],
       ["D5",0.5],["F5",0.5],["A5",0.5],["B5",0.5],["A5",0.5],["F5",0.5],["D5",1],
@@ -971,6 +971,10 @@ const copyLink = (id) => {
   const handleCreateCard = async () => {
     if (!cForm.fromName.trim() || !cForm.message.trim()) { setError("Remplis ton prénom et ton message 💕"); return; }
     setLoading(true); setError("");
+if (aForm.photo && aForm.photo.length > 50000) {
+  setError("📸 Photo trop lourde pour être envoyée. Continue sans photo.");
+  setLoading(false); return;
+}
     try {
       const id = generateId("C");
       await Storage.save(id, { ...cForm, type:"card", id, forId:announcement?.id, forName:announcement?.name, ts:Date.now() });
@@ -983,6 +987,10 @@ const copyLink = (id) => {
     const c = inputCode.trim().toUpperCase();
     if (!c) return;
     setLoading(true); setError("");
+if (cForm.photo && cForm.photo.length > 50000) {
+  setError("📸 Photo trop lourde pour être envoyée. Continue sans photo.");
+  setLoading(false); return;
+}
     try {
       const data = await Storage.load(c);
       if (!data || data.type !== "card") { setError("Code introuvable !"); setLoading(false); return; }
