@@ -14,7 +14,7 @@ const JSONBIN_BIN_ID = import.meta.env.VITE_JSONBIN_BIN_ID || "";
 const JSONBIN_BASE   = "https://api.jsonbin.io/v3/b";
 
 
-const BASE_URL = "https://birthdaylink.vercel.app";
+const BASE_URL = window.location.origin;
 const buildShareLink = (id) => `${BASE_URL}/?id=${id}`;
 // ══════════════════════════════════════════════════════════════
 //  STORAGE LAYER
@@ -1072,7 +1072,7 @@ const copyLink = (id) => {
         </div>
 
         <button style={S.btn()} onClick={handleCreateAnnouncement} disabled={loading}>
-          {loading ? "⏳ Création en cours..." : "✨ Générer mon code d'annonce"}
+          {loading ? "⏳ Création en cours..." : "✨ Générer mon Annonce"}
         </button>
       </div>
     </div>
