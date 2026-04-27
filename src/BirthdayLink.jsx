@@ -13,6 +13,9 @@ const JSONBIN_KEY    = import.meta.env.VITE_JSONBIN_KEY    || "";
 const JSONBIN_BIN_ID = import.meta.env.VITE_JSONBIN_BIN_ID || "";
 const JSONBIN_BASE   = "https://api.jsonbin.io/v3/b";
 
+
+const BASE_URL = "https://birthdaylink.vercel.app";
+const buildShareLink = (id) => `${BASE_URL}/?id=${id}`;
 // ══════════════════════════════════════════════════════════════
 //  STORAGE LAYER
 //  Un seul bin JSONbin = base de données clé-valeur partagée
@@ -914,6 +917,34 @@ export default function BirthdayApp() {
 
   const go = (v) => { setView(v); setError(""); setInputCode(""); };
 
+// Auto-load si lien partagé (?id=A-XXXXX ou C-XXXXX)
+useEffect(() => {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) return;
+  const upper = id.trim().toUpperCase();
+  setLoading(true);
+  Storage.load(upper).then(data => {
+    if (!data) { setError("Lien invalide ou expiré 😕"); setLoading(false); return; }
+    if (data.type === "announcement") { setAnnouncement(data); bang(7000); setView("view-announce"); }
+    else if (data.type === "card")    { setCard(data);         bang(7000); setView("view-card"); }
+    setLoading(false);
+  }).catch(() => { setError("Erreur de connexion."); setLoading(false); });
+}, []); // eslint-disable-line
+
+const copyLink = (id) => {
+  const link = buildShareLink(id);
+  if (navigator.share) {
+    navigator.share({ title: "BirthdayLink 🎂", url: link });
+    return;
+  }
+  navigator.clipboard.writeText(link).catch(() => {
+    const el = document.createElement("textarea");
+    el.value = link; document.body.appendChild(el); el.select();
+    document.execCommand("copy"); document.body.removeChild(el);
+  });
+  setCopied(true); setTimeout(() => setCopied(false), 2500);
+};
+
   const handleCreateAnnouncement = async () => {
     if (!aForm.name.trim() || !aForm.message.trim()) { setError("Remplis au moins ton prénom et ton message 💕"); return; }
     setLoading(true); setError("");
@@ -1059,24 +1090,25 @@ export default function BirthdayApp() {
         </h2>
         <p style={{ color:"#aaa", fontSize:"14px", margin:"0 0 22px", fontWeight:"700" }}>Partage ce code avec tes proches 👇</p>
 
-        <div style={S.codeBox()}>
-          <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.75)", fontWeight:"900", letterSpacing:"2px", marginBottom:"8px" }}>CODE D'ANNONCE</div>
-          <div style={S.codeText}>{code}</div>
-        </div>
+  <div style={S.codeBox()}>
+  <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.75)", fontWeight:"900", letterSpacing:"2px", marginBottom:"8px" }}>TON LIEN D'ANNONCE</div>
+  <div style={{ fontSize:"clamp(11px,3vw,13px)", color:"white", wordBreak:"break-all", fontWeight:"700" }}>
+    {buildShareLink(code)}
+  </div>
+</div>
+        <button style={S.btn(copied ? "linear-gradient(135deg,#6BCB77,#4CAF50)" : undefined)}
 
-        <button style={S.btn(copied ? "linear-gradient(135deg,#6BCB77,#4CAF50)" : undefined)} onClick={() => copyCode(code)}>
-          {copied ? "✅ Copié !" : "📋 Copier le code"}
+onClick={() => copyLink(code)}>
+  {copied ? "✅ Lien copié !" : "🔗 Partager le lien"}
         </button>
 
-        <div style={S.info()}>
-          <strong style={{ color:"#FF6B6B" }}>Comment ça marche ?</strong><br />
-          1️⃣ Copie ce code<br />
-          2️⃣ Envoie-le via WhatsApp, SMS...<br />
-          3️⃣ Tes proches → BirthdayLink → <em>"J'ai reçu une invitation"</em><br />
-          4️⃣ Ils voient ton annonce + ta musique 🎵<br />
-          5️⃣ Ils créent leur carte et t'envoient leur code 💝
-        </div>
-
+<div style={S.info()}>
+  <strong style={{ color:"#FF6B6B" }}>Comment ça marche ?</strong><br />
+  1️⃣ Clique "Partager le lien"<br />
+  2️⃣ Envoie via WhatsApp ou SMS<br />
+  3️⃣ Tes proches cliquent → voient l'annonce directement 🎉<br />
+  4️⃣ Ils créent leur carte depuis l'annonce 💝
+</div>
         <button style={S.btn("linear-gradient(135deg,#667eea,#764ba2)")} onClick={() => go("home")}>🏠 Retour à l'accueil</button>
       </div>
     </div>
@@ -1170,12 +1202,16 @@ export default function BirthdayApp() {
         </p>
 
         <div style={S.codeBox("linear-gradient(135deg,#A18CD1,#FBC2EB)")}>
-          <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.75)", fontWeight:"900", letterSpacing:"2px", marginBottom:"8px" }}>CODE DE CARTE</div>
-          <div style={S.codeText}>{code}</div>
-        </div>
+          <div style={S.codeBox("linear-gradient(135deg,#A18CD1,#FBC2EB)")}>
+  <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.75)", fontWeight:"900", letterSpacing:"2px", marginBottom:"8px" }}>TON LIEN DE CARTE</div>
+  <div style={{ fontSize:"clamp(11px,3vw,13px)", color:"white", wordBreak:"break-all", fontWeight:"700" }}>
+    {buildShareLink(code)}
+  </div>
+</div>
 
-        <button style={S.btn(copied ? "linear-gradient(135deg,#6BCB77,#4CAF50)" : "linear-gradient(135deg,#A18CD1,#FBC2EB)")} onClick={() => copyCode(code)}>
-          {copied ? "✅ Copié !" : "📋 Copier le code"}
+        <button style={S.btn(copied ? "linear-gradient(135deg,#6BCB77,#4CAF50)" : "linear-gradient(135deg,#A18CD1,#FBC2EB)")} 
+onClick={() => copyLink(code)}>
+  {copied ? "✅ Lien copié !" : "🔗 Partager le lien"}
         </button>
 
         <div style={S.info("#F9F5FF","#999")}>
