@@ -14,38 +14,66 @@ const buildShareLink = (id) => `${BASE_URL}/?id=${id}`;
 // ══════════════════════════════════════════════════════════════
 //  STORAGE LAYER
 // ══════════════════════════════════════════════════════════════
-const Storage = {
+  
+   const Storage = {
   _ready() { return !!(JSONBIN_KEY && JSONBIN_BIN_ID); },
-  async _getAll() {
+
+  async _getIndex() {
     const r = await fetch(`${JSONBIN_BASE}/${JSONBIN_BIN_ID}/latest`, {
       headers: { "X-Master-Key": JSONBIN_KEY, "X-Bin-Meta": "false" },
     });
-    if (!r.ok) throw new Error("JSONbin read failed");
+    if (!r.ok) throw new Error("Index read failed");
     return await r.json();
   },
-  async _setAll(db) {
+
+  async _setIndex(index) {
     const r = await fetch(`${JSONBIN_BASE}/${JSONBIN_BIN_ID}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_KEY },
-      body: JSON.stringify(db),
+      body: JSON.stringify(index),
     });
-    if (!r.ok) throw new Error("JSONbin write failed");
+    if (!r.ok) throw new Error("Index write failed");
   },
+
   async save(code, data) {
     if (this._ready()) {
-      const db = await this._getAll();
-      db[code] = data;
-      await this._setAll(db);
+      // Crée un bin dédié pour cette entrée (photo incluse)
+      const r = await fetch(`${JSONBIN_BASE}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": JSONBIN_KEY,
+          "X-Bin-Name": code,
+          "X-Bin-Private": "false",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!r.ok) throw new Error("Sauvegarde échouée (bin création)");
+      const result = await r.json();
+      const binId = result.metadata.id;
+
+      // Met à jour l'index maître avec juste le binId (léger)
+      const index = await this._getIndex();
+      index[code] = binId;
+      await this._setIndex(index);
       return;
     }
+    // Fallback localStorage
     const db = JSON.parse(localStorage.getItem("bdl_db") || "{}");
     db[code] = data;
     localStorage.setItem("bdl_db", JSON.stringify(db));
   },
+
   async load(code) {
     if (this._ready()) {
-      const db = await this._getAll();
-      return db[code] || null;
+      const index = await this._getIndex();
+      const binId = index[code];
+      if (!binId) return null;
+      const r = await fetch(`${JSONBIN_BASE}/${binId}/latest`, {
+        headers: { "X-Master-Key": JSONBIN_KEY, "X-Bin-Meta": "false" },
+      });
+      if (!r.ok) return null;
+      return await r.json();
     }
     const db = JSON.parse(localStorage.getItem("bdl_db") || "{}");
     return db[code] || null;
