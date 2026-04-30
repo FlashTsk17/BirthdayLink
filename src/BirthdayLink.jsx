@@ -960,6 +960,10 @@ const copyLink = (id) => {
     const c = inputCode.trim().toUpperCase();
     if (!c) return;
     setLoading(true); setError("");
+if (aForm.photo && aForm.photo.length > 50000) {
+  setError("📸 Photo trop lourde pour être envoyée. Continue sans photo.");
+  setLoading(false); return;
+}
     try {
       const data = await Storage.load(c);
       if (!data || data.type !== "announcement") { setError("Code introuvable ! Vérifie bien ce qu'on t'a envoyé."); setLoading(false); return; }
