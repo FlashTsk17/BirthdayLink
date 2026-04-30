@@ -72,7 +72,7 @@ function generateId(prefix) {
   return id;
 }
 
-async function resizeImage(dataUrl, maxDim = 200) {
+async function resizeImage(dataUrl, maxDim = 600) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
@@ -81,7 +81,7 @@ async function resizeImage(dataUrl, maxDim = 200) {
       canvas.width = Math.round(img.width * ratio);
       canvas.height = Math.round(img.height * ratio);
       canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.2));
+      resolve(canvas.toDataURL("image/jpeg", 0.6));
     };
     img.onerror = () => resolve(dataUrl);
     img.src = dataUrl;
@@ -622,7 +622,7 @@ function ViewAnnounce({ data, confetti, go, setCForm }) {
             backgroundClip:"text",
             margin:"6px 0 10px", lineHeight:1.15,
           }}>
-            Joyeux Anniversaire<br />{data?.name} !
+      🎉 {data?.name}<br />fête son anniversaire !
           </h1>
           <div style={{ fontSize:"clamp(22px,6vw,28px)", letterSpacing:"4px", marginBottom:"14px" }}>
             🎉🎈🎊🎁🎂
@@ -1038,7 +1038,7 @@ if (cForm.photo && cForm.photo.length > 50000) {
       <div style={S.card()}>
         <button style={S.back()} onClick={() => go("home")}>← Retour</button>
         <h2 style={{ fontFamily:"'Fredoka One', cursive", fontSize:"clamp(22px,6vw,28px)", color:"#FF4757", margin:"0 0 4px" }}>🎂 Crée ton annonce</h2>
-        <p style={{ color:"#bbb", fontSize:"13px", margin:"0 0 20px", fontWeight:"700" }}>Personnalise-la et partage le code à tes proches</p>
+        <p style={{ color:"#bbb", fontSize:"13px", margin:"0 0 20px", fontWeight:"700" }}>Personnalise-la et partage le lien avec tes proches</p>
 
         {error && <div style={S.err()}>{error}</div>}
 
@@ -1206,7 +1206,7 @@ onClick={() => copyLink(code)}>
         <div style={{ fontSize:"clamp(52px,15vw,72px)", animation:"pulse 1.8s infinite" }}>💝</div>
         <h2 style={{ fontFamily:"'Fredoka One', cursive", fontSize:"clamp(22px,6vw,28px)", color:"#8B5CF6", margin:"8px 0 6px" }}>Ta carte est prête !</h2>
         <p style={{ color:"#aaa", fontSize:"14px", margin:"0 0 22px", fontWeight:"700" }}>
-          Envoie ce code à {announcement?.name || "l'anniversaire"} 🎁
+          Partage ce lien avec {announcement?.name || "l'anniversaire"} 🎁
         </p>
 
         <div  style={S.codeBox("linear-gradient(135deg,#A18CD1,#FBC2EB)")}>
